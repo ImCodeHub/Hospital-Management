@@ -1,9 +1,12 @@
 package com.Hospital.Hospital.Management.Entity;
 
+import java.time.LocalDate;
 import java.util.Collection;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,6 +15,9 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -25,16 +31,22 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 @Table(name="user")
+@Inheritance(strategy = InheritanceType.JOINED)
 public class User implements UserDetails{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
+    @Column(name = "user_id")
+    private String userId;
+
     @Column(name = "first_name")
     private String firstName;
 
     @Column(name = "last_name")
     private String lastName;
+
+    private String gender;
 
     @Email
     private String email;
@@ -46,8 +58,24 @@ public class User implements UserDetails{
     @NotNull
     private String password;
 
+    private String speciality;
+
+    @Column(length = 500)
+    private String discription;
+
+    @Column(name = "date_of_joining")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+    private LocalDate dateOfJoining;
+
+    private String address;
+    
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @PrePersist
+    protected void onCreate() {
+        this.dateOfJoining = LocalDate.now();
+    }
     
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
