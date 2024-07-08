@@ -34,5 +34,17 @@ public class CustomException {
             super(message);
         }
     }
+
+    public static class AppoinmentNotBookedException extends RuntimeException{
+        public AppoinmentNotBookedException(String message){
+            super(message);
+        }
+    }
+    public static class AppoinmentNotFoundException extends RuntimeException{
+        public AppoinmentNotFoundException(String message){
+            super(message);
+        }
+    }
+
     
 }

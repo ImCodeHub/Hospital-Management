@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 
+import com.Hospital.Hospital.Management.Exception.CustomException.AppoinmentNotBookedException;
+import com.Hospital.Hospital.Management.Exception.CustomException.AppoinmentNotFoundException;
 import com.Hospital.Hospital.Management.Exception.CustomException.EmailAlreadyExistException;
 import com.Hospital.Hospital.Management.Exception.CustomException.IncorrectPasswordException;
 import com.Hospital.Hospital.Management.Exception.CustomException.InvalidEmailException;
@@ -37,6 +39,14 @@ public class GlobalExceptionHandler {
     
     @ExceptionHandler(IncorrectPasswordException.class)
     public ResponseEntity<?> handleIncorrectPasswordException(IncorrectPasswordException exception, WebRequest request){
+        return new ResponseEntity<>(exception.getMessage(),HttpStatus.UNAUTHORIZED);
+    }
+    @ExceptionHandler(AppoinmentNotBookedException.class)
+    public ResponseEntity<?> handleAppoinmentNotBookedException(AppoinmentNotBookedException exception, WebRequest request){
+        return new ResponseEntity<>(exception.getMessage(),HttpStatus.UNAUTHORIZED);
+    }
+    @ExceptionHandler(AppoinmentNotFoundException.class)
+    public ResponseEntity<?> handleAppoinmentNotFoundException(AppoinmentNotFoundException exception, WebRequest request){
         return new ResponseEntity<>(exception.getMessage(),HttpStatus.UNAUTHORIZED);
     }
 
