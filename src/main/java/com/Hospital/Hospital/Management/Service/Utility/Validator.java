@@ -1,7 +1,7 @@
 package com.Hospital.Hospital.Management.Service.Utility;
 
+import java.security.SecureRandom;
 import java.util.Optional;
-import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -46,25 +46,36 @@ public class Validator {
             case NURSE:
                 prefix = "NR";
                 break;
+            case ADMIN:
+                prefix = "AD";
+                break;
 
             default:
                 return null;
 
-            }
-            return generateUUID(prefix);
+        }
+        return generateRandomId(prefix);
 
     }
 
-    private String generateUUID(String prefix) {
-        String uuid = UUID.randomUUID().toString().replace("-", "").substring(0, 8);
-        String userid = prefix + uuid;
+    private String generateRandomId(String prefix) {
+        String userid = prefix + generateRandomNumber(8);
 
         Optional<User> optional = userRepository.findByUserId(userid);
         if (optional.isPresent()) {
-            generateUUID(prefix);
+            generateRandomId(prefix);
         } else {
             return userid;
         }
         throw new RuntimeException("Unique id not generated.");
+    }
+
+    public String generateRandomNumber(int length) {
+        SecureRandom random = new SecureRandom();
+        StringBuilder sb = new StringBuilder(length);
+        for (int i = 0; i <= length; i++) {
+            sb.append(random.nextInt(10));
+        }
+        return sb.toString();
     }
 }
