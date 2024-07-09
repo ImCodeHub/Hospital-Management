@@ -2,11 +2,13 @@ package com.Hospital.Hospital.Management.Controller;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import com.Hospital.Hospital.Management.Entity.Appoinment;
+import com.Hospital.Hospital.Management.Entity.Appointment;
 import com.Hospital.Hospital.Management.Entity.User;
-import com.Hospital.Hospital.Management.Service.Implement.AppoinmentServiceImpl;
+import com.Hospital.Hospital.Management.Model.AppointmentModel;
+import com.Hospital.Hospital.Management.Service.Implement.AppointmentServiceImpl;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,7 +16,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 
@@ -24,21 +28,31 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class PatientController {
     
     @Autowired
-    private AppoinmentServiceImpl appoinmentServiceImpl;
+    private AppointmentServiceImpl appointmentServiceImpl;
 
     @PostMapping("appoinment")
     public ResponseEntity<String> bookAppoinment(@AuthenticationPrincipal User user){
-        String response = appoinmentServiceImpl.bookAppoinment(user);
+        String response = appointmentServiceImpl.bookAppointment(user);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     // to get list of appoinment.
     @GetMapping("allAppoinment")
-    public ResponseEntity<List<Appoinment>> allAppoinments(){
-        List<Appoinment> list = appoinmentServiceImpl.getAllAppoinments();
+    public ResponseEntity<List<Appointment>> allAppoinments(){
+        List<Appointment> list = appointmentServiceImpl.getAllAppointments();
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
-    
 
+    @GetMapping("appoinment/recent")
+    public ResponseEntity<List<AppointmentModel>> recentAppoinment(@AuthenticationPrincipal User user){
+        List<AppointmentModel> list = appointmentServiceImpl.getRecentAppointment(user.getUserId());
+        return new ResponseEntity<>(list, HttpStatus.OK);
+    }
+
+    @PutMapping("appoinment/cancel/{id}")
+    public ResponseEntity<String> cancelAppoinment(@PathVariable String id){
+        String response = appointmentServiceImpl.cancelAppointment(id);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
     
 }
