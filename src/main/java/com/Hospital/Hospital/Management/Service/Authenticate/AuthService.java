@@ -64,6 +64,7 @@ public class AuthService {
                 .lastName(registerRequest.getLastName())
                 .gender(registerRequest.getGender())
                 .mobileNo(mobile)
+                .blacklisted(false)
                 .email(email)
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
                 .speciality(registerRequest.getSpeciality())
@@ -84,6 +85,11 @@ public class AuthService {
             var user = userRepository.findByEmail(request.getEmail())
                     .orElseThrow(
                             () -> new UsernameNotFoundException("User not found with email: " + request.getEmail()));
+
+            // Check if the user is blacklisted
+            if (user.isBlacklisted()) {
+                throw new RuntimeException("User is blacklisted and cannot log in.");
+            }
             // Second step: Verify the user is present in the database
             // Verify whether the user is present in the database and the password is
             // correct
