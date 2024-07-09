@@ -34,9 +34,6 @@ import lombok.NoArgsConstructor;
 @Inheritance(strategy = InheritanceType.JOINED)
 public class User implements UserDetails{
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     @Column(name = "user_id")
     private String userId;
 
@@ -68,6 +65,8 @@ public class User implements UserDetails{
     private LocalDate dateOfJoining;
 
     private String address;
+
+    private boolean blacklisted;
     
     @Enumerated(EnumType.STRING)
     private Role role;
