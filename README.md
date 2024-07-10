@@ -71,8 +71,8 @@ src/main/java/com/example/hospitalmanagement
 ## Authentication and Authorization
 This project uses `JWT` for authentication and authorization. The following endpoints are available:
 
-- Registration: POST /api/auth/register
-- Login: POST /api/auth/authenticate
+- Registration: POST `/api/auth/register`
+- Login: POST `/api/auth/authenticate`
 
 ## Security Configuration
 The security configuration is handled by SecurityConfiguration.java. It includes:
