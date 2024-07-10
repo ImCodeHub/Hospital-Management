@@ -81,6 +81,7 @@ The security configuration is handled by SecurityConfiguration.java. It includes
 - Session management policy set to STATELESS
 - Permit all for /api/auth/** endpoints
 - JWT authentication filter for other endpoints
+- make user Blacklisted & whitelisted
   
 ## Contributing
 Contributions are welcome! Please open an issue or submit a pull request.
