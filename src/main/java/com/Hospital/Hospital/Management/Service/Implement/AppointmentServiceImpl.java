@@ -12,7 +12,7 @@ import com.Hospital.Hospital.Management.Entity.User;
 import com.Hospital.Hospital.Management.Exception.CustomException.AppoinmentNotBookedException;
 import com.Hospital.Hospital.Management.Exception.CustomException.AppoinmentNotFoundException;
 import com.Hospital.Hospital.Management.Model.AppointmentModel;
-import com.Hospital.Hospital.Management.Repository.AppoinmentRepository;
+import com.Hospital.Hospital.Management.Repository.AppointmentRepository;
 import com.Hospital.Hospital.Management.Service.AppointmentService;
 import com.Hospital.Hospital.Management.Service.Utility.Validator;
 
@@ -20,14 +20,14 @@ import com.Hospital.Hospital.Management.Service.Utility.Validator;
 public class AppointmentServiceImpl implements AppointmentService {
 
     @Autowired
-    private AppoinmentRepository appoinmentRepository;
+    private AppointmentRepository appointmentRepository;
 
     @Autowired
     private Validator validator;
 
     public String generateAppoinmentId() {
         String appoinmentId = validator.generateRandomNumber(5);
-        Optional<Appointment> optional = appoinmentRepository.findByAppoinmentId(appoinmentId);
+        Optional<Appointment> optional = appointmentRepository.findByAppointmentId(appoinmentId);
         if (optional.isPresent()) {
             generateAppoinmentId();
         } else {
@@ -37,15 +37,22 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     @Override
-    public String bookAppointment(User user) {
+    public String bookAppointment(AppointmentModel appointmentModel,User user) {
         try {
-            String appoinmentId = generateAppoinmentId();
-            Appointment appoinment = new Appointment();
-            appoinment.setAppoinmentId(appoinmentId);
-            appoinment.setPatient(user);
-            appoinment.setStatus(AppointmentStatus.PENDING);
+            String appointmentId = generateAppoinmentId();
+
+            Appointment appointment = new Appointment();
+            appointment.setAppointmentId(appointmentId);
+            appointment.setUserName(user.getFirstName()+" "+user.getLastName());
+            appointment.setReason(appointmentModel.getReason());
+            appointment.setDateOfBirth(appointmentModel.getDateOfBirth());
+            appointment.setAppointmentDate(appointmentModel.getAppointmentDate());
+            appointment.setAppointmentTime(appointmentModel.getAppointmentTime());
+            appointment.setLocation(appointmentModel.getLocation());
+            appointment.setPatient(user);
+            appointment.setStatus(AppointmentStatus.PENDING);
             // to save in db
-            appoinmentRepository.save(appoinment);
+            appointmentRepository.save(appointment);
             return "your appoinment has been booked.";
         } catch (AppoinmentNotBookedException e) {
             throw new AppoinmentNotBookedException("appoinment not booked please try again.");
@@ -55,7 +62,7 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Override
     public List<Appointment> getAllAppointments() {
-        List<Appointment> list = appoinmentRepository.findAll();
+        List<Appointment> list = appointmentRepository.findAll();
         if (list.isEmpty()) {
             throw new AppoinmentNotFoundException("Appoinment not found.");
         } else {
@@ -72,42 +79,45 @@ public class AppointmentServiceImpl implements AppointmentService {
         int currentYear = currentDate.getYear();
         int currentMonth = currentDate.getMonthValue();
 
-        List<Appointment> appoinments = appoinmentRepository.findByYearAndMonth(currentYear, currentMonth, userId);
+        List<Appointment> appointments = appointmentRepository.findByYearAndMonth(currentYear, currentMonth, userId);
 
-        for (Appointment appoinment : appoinments) {
-            AppointmentModel appoinmentModel = new AppointmentModel();
-            appoinmentModel.setAppoinmentId(appoinment.getAppoinmentId());
-            appoinmentModel
-                    .setPatient(appoinment.getPatient().getFirstName() + " " + appoinment.getPatient().getLastName());
-            appoinmentModel.setReason(appoinment.getReason());
+        for (Appointment appointment : appointments) {
+            AppointmentModel appointmentModel = new AppointmentModel();
+            appointmentModel.setAppointmentId(appointment.getAppointmentId());
+            appointmentModel
+                    .setPatient(appointment.getPatient().getFirstName() + " " + appointment.getPatient().getLastName());
+            appointmentModel.setReason(appointment.getReason());
 
             // Null check for doctor
-            if (appoinment.getDoctor() != null) {
-                appoinmentModel.setDoctor(appoinment.getDoctor().getFirstName() + " " + appoinment.getDoctor().getLastName());
+            if (appointment.getDoctor() != null) {
+                appointmentModel
+                        .setDoctor(appointment.getDoctor().getFirstName() + " " + appointment.getDoctor().getLastName());
             } else {
-                appoinmentModel.setDoctor("No doctor assigned");
+                appointmentModel.setDoctor("No doctor assigned");
             }
-            appoinmentModel.setAppoinmentDate(appoinment.getAppoinmentDate());
-            appoinmentModel.setDateOfBooking(appoinment.getDateOfBooking());
-            appoinmentModel.setLocation(appoinment.getPatient().getAddress());
-            appoinmentModel.setStatus(appoinment.getStatus());
+            appointmentModel.setDateOfBirth(appointment.getDateOfBirth());
+            appointmentModel.setAppointmentDate(appointment.getAppointmentDate());
+            appointmentModel.setDateOfBooking(appointment.getDateOfBooking());
+            appointmentModel.setLocation(appointment.getLocation());
+            appointmentModel.setStatus(appointment.getStatus());
+            appointmentModel.setAppointmentTime(appointment.getAppointmentTime());
 
-            list.add(appoinmentModel);
+            list.add(appointmentModel);
         }
         return list;
 
     }
 
     @Override
-    public String cancelAppointment(String appoinmentId) {
-        Optional<Appointment> optional = appoinmentRepository.findByAppoinmentId(appoinmentId);
-        if(optional.isPresent()){
-            Appointment appoinment = optional.get();
+    public String cancelAppointment(String appointmentId) {
+        Optional<Appointment> optional = appointmentRepository.findByAppointmentId(appointmentId);
+        if (optional.isPresent()) {
+            Appointment appointment = optional.get();
 
-            appoinment.setStatus(AppointmentStatus.CANCEL);
-            appoinmentRepository.save(appoinment);
-            return "Your appoinment has been canceled.";
+            appointment.setStatus(AppointmentStatus.CANCEL);
+            appointmentRepository.save(appointment);
+            return "Your appointment has been canceled.";
         }
-        throw new AppoinmentNotFoundException("Appoinment not found by this Id :"+ appoinmentId);
+        throw new AppoinmentNotFoundException("Appoinment not found by this Id :" + appointmentId);
     }
 }
