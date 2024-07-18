@@ -12,8 +12,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
@@ -54,11 +52,6 @@ public class User implements UserDetails{
 
     @NotNull
     private String password;
-
-    private String speciality;
-
-    @Column(length = 500)
-    private String discription;
 
     @Column(name = "date_of_joining")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
