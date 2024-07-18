@@ -8,20 +8,21 @@ import com.Hospital.Hospital.Management.Model.AppointmentModel;
 import com.Hospital.Hospital.Management.Service.Implement.AppointmentServiceImpl;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-
+@CrossOrigin
 @RestController
 @RequestMapping("api/v1/patient")
 @PreAuthorize("hasRole('PATIENT')")
@@ -30,9 +31,14 @@ public class PatientController {
     @Autowired
     private AppointmentServiceImpl appointmentServiceImpl;
 
-    @PostMapping("appoinment")
-    public ResponseEntity<String> bookAppoinment(@AuthenticationPrincipal User user){
-        String response = appointmentServiceImpl.bookAppointment(user);
+    @GetMapping("get-name")
+    public String getUserName(@AuthenticationPrincipal User user){
+        return user.getFirstName();
+    }
+
+    @PostMapping("appointment")  
+    public ResponseEntity<String> bookAppoinment(@RequestBody AppointmentModel appointmentModel , @AuthenticationPrincipal User user){
+        String response = appointmentServiceImpl.bookAppointment(appointmentModel,user);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
