@@ -67,9 +67,6 @@ public class AuthService {
                 .blacklisted(false)
                 .email(email)
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
-                .speciality(registerRequest.getSpeciality())
-                .discription(registerRequest.getDiscription())
-                .address(registerRequest.getAddress())
                 .role(registerRequest.getRole())
                 .build();
 
