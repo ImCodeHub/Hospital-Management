@@ -12,17 +12,21 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AppointmentModel {
-    private String appoinmentId;
+    private String appointmentId;
 
     private String patient;
 
     private String reason;
 
+    private LocalDate dateOfBirth;
+    
     private String doctor;
 
-    private LocalDate appoinmentDate;
+    private LocalDate appointmentDate;
 
     private LocalDate dateOfBooking;
+
+    private String appointmentTime;
 
     private String location;
 

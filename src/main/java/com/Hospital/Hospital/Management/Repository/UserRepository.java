@@ -1,17 +1,17 @@
 package com.Hospital.Hospital.Management.Repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
-import com.Hospital.Hospital.Management.Entity.Role;
 import com.Hospital.Hospital.Management.Entity.User;
 
-import jakarta.transaction.Transactional;
+import lombok.NonNull;
 
 import java.util.*;
 
+@Repository
 public interface UserRepository extends JpaRepository<User,String>{
     
     Optional<User>findByEmail(String email);
@@ -26,6 +26,7 @@ public interface UserRepository extends JpaRepository<User,String>{
     // @Transactional
     // @Modifying
     // @Query(value = "DELETE FROM User WHERE user_id = :userId", nativeQuery = true)
+    @NonNull
     void deleteById(String userId);
 
 
