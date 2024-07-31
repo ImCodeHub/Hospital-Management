@@ -4,10 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.Hospital.Hospital.Management.Model.AuthenticationRequest;
@@ -47,6 +50,29 @@ public class AuthController {
         logger.info("Authentication done successfully for email: {}", request.getEmail());
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @PostMapping("/getOtp/{email}")
+    public ResponseEntity<String> getOtp(@PathVariable("email") String email){
+        String response = authService.getOtp(email);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/verifyOtp")
+    public ResponseEntity<Boolean> verifyOtp(@RequestParam("email") String email, @RequestParam("otp") String otp ){
+        Boolean response = authService.varifyOtp(email, otp);
+        if (response) {
+            return new ResponseEntity<>(response,HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>(response,HttpStatus.CONFLICT);
+        }
+    }
+
+    @PutMapping("/updatePassword")
+    public ResponseEntity<Boolean> updatePassword(@RequestParam("email") String email, @RequestParam("password") String newPassword){
+        Boolean response = authService.updatePassword(email,newPassword);
+        return new ResponseEntity<>(response,HttpStatus.OK);
+    }
+
 
     // to user logout
     @PostMapping("/logout")
