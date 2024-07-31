@@ -37,8 +37,8 @@ public class PatientController {
     }
 
     @PostMapping("appointment")  
-    public ResponseEntity<String> bookAppoinment(@RequestBody AppointmentModel appointmentModel , @AuthenticationPrincipal User user){
-        String response = appointmentServiceImpl.bookAppointment(appointmentModel,user);
+    public ResponseEntity<String> bookAppoinment(@RequestBody Appointment appointment , @AuthenticationPrincipal User user){
+        String response = appointmentServiceImpl.bookAppointment(appointment,user);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
