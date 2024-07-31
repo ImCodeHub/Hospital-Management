@@ -8,7 +8,7 @@ import com.Hospital.Hospital.Management.Model.AppointmentModel;
 
 public interface AppointmentService {
 
-    public String bookAppointment(AppointmentModel appointmentModel, User user);
+    public String bookAppointment(Appointment appointment, User user);
 
     public List<Appointment> getAllAppointments();
 
