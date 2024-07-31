@@ -1,5 +1,7 @@
 package com.Hospital.Hospital.Management.Service.Authenticate;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -18,8 +20,11 @@ import com.Hospital.Hospital.Management.Exception.CustomException.UserNotFoundEx
 import com.Hospital.Hospital.Management.Model.AuthenticationRequest;
 import com.Hospital.Hospital.Management.Model.RegisterRequest;
 import com.Hospital.Hospital.Management.Repository.UserRepository;
+import com.Hospital.Hospital.Management.Service.Utility.EmailService;
+import com.Hospital.Hospital.Management.Service.Utility.OTP;
 import com.Hospital.Hospital.Management.Service.Utility.Validator;
 
+import jakarta.mail.MessagingException;
 import lombok.*;
 
 @Service
@@ -40,11 +45,16 @@ public class AuthService {
     @Autowired
     private final Validator validator;
 
+    @Autowired
+    private final EmailService emailService;
+
     public AuthenticationResponse register(RegisterRequest registerRequest) {
 
         String email = registerRequest.getEmail();
         String mobile = registerRequest.getMobileNo();
         String uniqueId = validator.generateID(registerRequest.getRole());
+        String subject = "Registration at Hospital";
+        String text = emailService.greetingMail(registerRequest.getFirstName());
 
         if (!validator.isValidEmail(email)) {
             throw new InvalidEmailException("Email is invalid kinldy Enter valid E-mail id");
@@ -69,7 +79,11 @@ public class AuthService {
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
                 .role(registerRequest.getRole())
                 .build();
-
+        try {
+            emailService.sendEmail(email, subject, text);
+        } catch (MessagingException e) {
+            throw new RuntimeException("Failed to send email", e);
+        }
         userRepository.save(user);
 
         String jwtToken = jwtService.generateToken(user);
@@ -110,6 +124,46 @@ public class AuthService {
         } catch (AuthenticationException e) {
             // handle authentication failed
             throw new RuntimeException("Authentication failed. Please try again.");
+        }
+    }
+
+    public String getOtp(String email) {
+        Boolean response = validator.isEmailAvailable(email);
+        if (response) {
+            String otp = OTP.generateOtp(email); // get otp using generateOtp method.
+            // sending email
+
+            String subject = "E-mail for OTP varification"; // this is mail subject
+
+            String text = emailService.otpMail(otp); // this is mail text body.
+
+            try {
+                emailService.sendEmail(email, subject, text);
+            } catch (MessagingException e) {
+                throw new RuntimeException("Failed to send email", e);
+            }
+            return "OTP has been sent to your E-mail id";
+
+        } else {
+            throw new UserNotFoundException("User not found by this E-mail");
+        }
+    }
+
+    public Boolean varifyOtp(String userEmail, String enteredOtp) {
+        Boolean response = OTP.validateOtp(userEmail, enteredOtp);
+        return response;
+    }
+
+    public Boolean updatePassword(String userEmail, String newPassword) {
+        Optional<User> optional = userRepository.findByEmail(userEmail);
+        if (optional.isPresent()) {
+            User user = optional.get();
+            user.setPassword(passwordEncoder.encode(newPassword));
+            userRepository.save(user);
+            // return true if password has updated.
+            return true;
+        } else {
+            throw new UsernameNotFoundException("User not found with email: " + userEmail);
         }
     }
 
