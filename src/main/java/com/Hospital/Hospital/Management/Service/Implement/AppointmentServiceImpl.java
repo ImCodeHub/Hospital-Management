@@ -14,6 +14,7 @@ import com.Hospital.Hospital.Management.Exception.CustomException.AppoinmentNotF
 import com.Hospital.Hospital.Management.Model.AppointmentModel;
 import com.Hospital.Hospital.Management.Repository.AppointmentRepository;
 import com.Hospital.Hospital.Management.Service.AppointmentService;
+import com.Hospital.Hospital.Management.Service.Utility.AgeCalculator;
 import com.Hospital.Hospital.Management.Service.Utility.Validator;
 
 @Service
@@ -37,18 +38,17 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     @Override
-    public String bookAppointment(AppointmentModel appointmentModel,User user) {
+    public String bookAppointment(Appointment appointment,User user) {
         try {
             String appointmentId = generateAppoinmentId();
 
-            Appointment appointment = new Appointment();
             appointment.setAppointmentId(appointmentId);
             appointment.setUserName(user.getFirstName()+" "+user.getLastName());
-            appointment.setReason(appointmentModel.getReason());
-            appointment.setDateOfBirth(appointmentModel.getDateOfBirth());
-            appointment.setAppointmentDate(appointmentModel.getAppointmentDate());
-            appointment.setAppointmentTime(appointmentModel.getAppointmentTime());
-            appointment.setLocation(appointmentModel.getLocation());
+            appointment.setReason(appointment.getReason());
+            appointment.setDateOfBirth(appointment.getDateOfBirth());
+            appointment.setAppointmentDate(appointment.getAppointmentDate());
+            appointment.setAppointmentTime(appointment.getAppointmentTime());
+            appointment.setLocation(appointment.getLocation());
             appointment.setPatient(user);
             appointment.setStatus(AppointmentStatus.PENDING);
             // to save in db
@@ -79,7 +79,10 @@ public class AppointmentServiceImpl implements AppointmentService {
         int currentYear = currentDate.getYear();
         int currentMonth = currentDate.getMonthValue();
 
+        
+
         List<Appointment> appointments = appointmentRepository.findByYearAndMonth(currentYear, currentMonth, userId);
+        
 
         for (Appointment appointment : appointments) {
             AppointmentModel appointmentModel = new AppointmentModel();
@@ -95,7 +98,8 @@ public class AppointmentServiceImpl implements AppointmentService {
             } else {
                 appointmentModel.setDoctor("No doctor assigned");
             }
-            appointmentModel.setDateOfBirth(appointment.getDateOfBirth());
+            int age = AgeCalculator.calculateAge(appointment.getDateOfBirth());
+            appointmentModel.setAge(age);
             appointmentModel.setAppointmentDate(appointment.getAppointmentDate());
             appointmentModel.setDateOfBooking(appointment.getDateOfBooking());
             appointmentModel.setLocation(appointment.getLocation());
