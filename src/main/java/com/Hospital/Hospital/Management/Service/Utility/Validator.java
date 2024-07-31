@@ -10,6 +10,8 @@ import com.Hospital.Hospital.Management.Entity.Role;
 import com.Hospital.Hospital.Management.Entity.User;
 import com.Hospital.Hospital.Management.Repository.UserRepository;
 
+
+
 @Service
 public class Validator {
 
@@ -26,6 +28,15 @@ public class Validator {
         Optional<User> optional = userRepository.findByEmail(email);
         boolean isUnique = optional.isEmpty();
         return isUnique;
+    }
+
+    public Boolean isEmailAvailable(String email){
+        Optional<User> optional = userRepository.findByEmail(email);
+        if(optional.isPresent()){
+            return true;
+        }else{
+            return false;
+        }
     }
 
     public boolean isMobileNoUniue(String mobile) {
@@ -78,4 +89,5 @@ public class Validator {
         }
         return sb.toString();
     }
+
 }
