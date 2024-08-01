@@ -22,13 +22,4 @@ public interface UserRepository extends JpaRepository<User,String>{
 
     @Query(value ="SELECT * FROM User WHERE role = :role", nativeQuery = true)
     List<User> findByRole(@Param("role") String string);
-
-    // @Transactional
-    // @Modifying
-    // @Query(value = "DELETE FROM User WHERE user_id = :userId", nativeQuery = true)
-    @NonNull
-    void deleteById(String userId);
-
-
-
-}
+}       
