@@ -54,7 +54,6 @@ public class User implements UserDetails{
     private String password;
 
     @Column(name = "date_of_joining")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDate dateOfJoining;
 
     private boolean blacklisted;
