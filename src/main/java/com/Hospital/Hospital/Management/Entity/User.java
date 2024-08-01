@@ -57,8 +57,6 @@ public class User implements UserDetails{
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDate dateOfJoining;
 
-    private String address;
-
     private boolean blacklisted;
     
     @Enumerated(EnumType.STRING)
