@@ -29,8 +29,6 @@ public class RegisterRequest {
 
     private String password;
 
-    private String speciality;
-
     private String discription;
 
     private LocalDate dateOfJoining;
