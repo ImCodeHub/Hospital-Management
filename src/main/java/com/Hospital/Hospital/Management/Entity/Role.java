@@ -11,7 +11,8 @@ public enum Role {
     ADMIN,
     DOCTOR,
     NURSE,
-    PATIENT;
+    PATIENT,
+    STAFF;
 
     public List<SimpleGrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + this.name()));
