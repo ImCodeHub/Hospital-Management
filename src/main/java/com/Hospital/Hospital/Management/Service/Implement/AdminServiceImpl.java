@@ -5,9 +5,11 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.Hospital.Hospital.Management.Entity.User;
 import com.Hospital.Hospital.Management.Exception.CustomException.UserNotFoundException;
+import com.Hospital.Hospital.Management.Model.DoctorRegisterationModel;
 import com.Hospital.Hospital.Management.Repository.UserRepository;
 import com.Hospital.Hospital.Management.Service.AdminService;
 
@@ -51,5 +53,11 @@ public class AdminServiceImpl implements AdminService{
             return true;
         }
         throw new UserNotFoundException("User not found by this ID: "+userId);
+    }
+
+    @Override
+    public String registerDoctor(DoctorRegisterationModel doctorModel, MultipartFile imageFile) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'registerDoctor'");
     }
 }
