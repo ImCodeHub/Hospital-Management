@@ -7,8 +7,6 @@ import org.springframework.stereotype.Repository;
 
 import com.Hospital.Hospital.Management.Entity.User;
 
-import lombok.NonNull;
-
 import java.util.*;
 
 @Repository
