@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DoctorRegisterationModel {
-    private String userId;
+
 
     private String firstName;
 
@@ -28,7 +28,6 @@ public class DoctorRegisterationModel {
 
     private String discription;
 
-    private LocalDate dateOfJoining;
 
     private Role role;
 
