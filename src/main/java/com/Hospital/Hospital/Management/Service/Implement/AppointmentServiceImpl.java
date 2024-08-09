@@ -8,11 +8,13 @@ import org.springframework.stereotype.Service;
 
 import com.Hospital.Hospital.Management.Entity.Appointment;
 import com.Hospital.Hospital.Management.Entity.AppointmentStatus;
+import com.Hospital.Hospital.Management.Entity.Profile;
 import com.Hospital.Hospital.Management.Entity.User;
 import com.Hospital.Hospital.Management.Exception.CustomException.AppoinmentNotBookedException;
 import com.Hospital.Hospital.Management.Exception.CustomException.AppoinmentNotFoundException;
 import com.Hospital.Hospital.Management.Model.AppointmentModel;
 import com.Hospital.Hospital.Management.Repository.AppointmentRepository;
+import com.Hospital.Hospital.Management.Repository.ProfileRepository;
 import com.Hospital.Hospital.Management.Service.AppointmentService;
 import com.Hospital.Hospital.Management.Service.Utility.AgeCalculator;
 import com.Hospital.Hospital.Management.Service.Utility.Validator;
@@ -22,6 +24,9 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Autowired
     private AppointmentRepository appointmentRepository;
+
+    @Autowired
+    private ProfileRepository profileRepository;
 
     @Autowired
     private Validator validator;
@@ -79,11 +84,8 @@ public class AppointmentServiceImpl implements AppointmentService {
         int currentYear = currentDate.getYear();
         int currentMonth = currentDate.getMonthValue();
 
-        
-
         List<Appointment> appointments = appointmentRepository.findByYearAndMonth(currentYear, currentMonth, userId);
         
-
         for (Appointment appointment : appointments) {
             AppointmentModel appointmentModel = new AppointmentModel();
             appointmentModel.setAppointmentId(appointment.getAppointmentId());
@@ -91,13 +93,17 @@ public class AppointmentServiceImpl implements AppointmentService {
                     .setPatient(appointment.getPatient().getFirstName() + " " + appointment.getPatient().getLastName());
             appointmentModel.setReason(appointment.getReason());
 
-            // Null check for doctor
-            if (appointment.getDoctor() != null) {
-                appointmentModel
-                        .setDoctor(appointment.getDoctor().getFirstName() + " " + appointment.getDoctor().getLastName());
-            } else {
-                appointmentModel.setDoctor("No doctor assigned");
+            List<Profile> profiles = profileRepository.findByType(appointment.getReason());
+            
+            if(!profiles.isEmpty()){
+                Profile profile = profiles.get(0);
+                appointmentModel.setDoctor(profile.getUser().getFirstName()+" "+profile.getUser().getLastName());
+                appointmentModel.setDoctorId(profile.getUser().getUserId());
+            }else{
+                appointmentModel.setDoctor("N/A");
+                appointmentModel.setDoctorId("N/A");
             }
+            
             int age = AgeCalculator.calculateAge(appointment.getDateOfBirth());
             appointmentModel.setAge(age);
             appointmentModel.setAppointmentDate(appointment.getAppointmentDate());
@@ -122,6 +128,12 @@ public class AppointmentServiceImpl implements AppointmentService {
             appointmentRepository.save(appointment);
             return "Your appointment has been canceled.";
         }
-        throw new AppoinmentNotFoundException("Appoinment not found by this Id :" + appointmentId);
+        throw new AppoinmentNotFoundException("Appointment not found by this Id: " + appointmentId);
+    }
+
+    @Override
+    public List<String> getReasonTypes() {
+        List<String> types = profileRepository.findTypes();
+        return types;
     }
 }
