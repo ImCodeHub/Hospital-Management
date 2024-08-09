@@ -15,4 +15,6 @@ public interface AppointmentService {
     public List<AppointmentModel> getRecentAppointment(String userId);
 
     public String cancelAppointment(String appoinmentId);
+
+    public List<String> getReasonTypes();
 }
