@@ -21,6 +21,8 @@ public class AppointmentModel {
 
     private int age;
     
+    private String doctorId;
+
     private String doctor;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-YYYY")
