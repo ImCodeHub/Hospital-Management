@@ -1,7 +1,5 @@
 package com.Hospital.Hospital.Management.Model;
 
-import java.time.LocalDate;
-
 import com.Hospital.Hospital.Management.Entity.Role;
 
 import lombok.AllArgsConstructor;
@@ -12,7 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DoctorRegisterationModel {
-
 
     private String firstName;
 
@@ -26,9 +23,6 @@ public class DoctorRegisterationModel {
 
     private String password;
 
-    private String discription;
-
-
     private Role role;
 
     private String photo;
@@ -36,6 +30,8 @@ public class DoctorRegisterationModel {
     private String education;
 
     private String specialization;
+
+    private String type;
 
     private Long experience;
 
