@@ -17,7 +17,10 @@ import com.Hospital.Hospital.Management.Repository.AppointmentRepository;
 import com.Hospital.Hospital.Management.Repository.ProfileRepository;
 import com.Hospital.Hospital.Management.Service.AppointmentService;
 import com.Hospital.Hospital.Management.Service.Utility.AgeCalculator;
+import com.Hospital.Hospital.Management.Service.Utility.EmailService;
 import com.Hospital.Hospital.Management.Service.Utility.Validator;
+
+import jakarta.mail.MessagingException;
 
 @Service
 public class AppointmentServiceImpl implements AppointmentService {
@@ -31,6 +34,9 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Autowired
     private Validator validator;
 
+    @Autowired
+    private EmailService emailService;
+
     public String generateAppoinmentId() {
         String appoinmentId = validator.generateRandomNumber(5);
         Optional<Appointment> optional = appointmentRepository.findByAppointmentId(appoinmentId);
@@ -43,12 +49,12 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     @Override
-    public String bookAppointment(Appointment appointment,User user) {
+    public String bookAppointment(Appointment appointment, User user) {
         try {
             String appointmentId = generateAppoinmentId();
 
             appointment.setAppointmentId(appointmentId);
-            appointment.setUserName(user.getFirstName()+" "+user.getLastName());
+            appointment.setUserName(user.getFirstName() + " " + user.getLastName());
             appointment.setReason(appointment.getReason());
             appointment.setDateOfBirth(appointment.getDateOfBirth());
             appointment.setAppointmentDate(appointment.getAppointmentDate());
@@ -58,6 +64,23 @@ public class AppointmentServiceImpl implements AppointmentService {
             appointment.setStatus(AppointmentStatus.PENDING);
             // to save in db
             appointmentRepository.save(appointment);
+
+            // to send email about Appointment booking.
+            String patientName = user.getFirstName() + " " + user.getLastName();
+            String dateAndTime = appointment.getAppointmentDate() + " " + appointment.getAppointmentTime();
+            String reason = appointment.getReason();
+            String status = AppointmentStatus.PENDING.toString();
+
+            // basic email details
+            String email = user.getEmail();
+            String subject = "Appointment confirmation";
+            String text = emailService.appointmentBookedEmail(appointmentId, patientName, dateAndTime, reason, status);
+            try {
+                emailService.sendEmail(email, subject, text);
+            } catch (MessagingException e) {
+                throw new RuntimeException("Failed to send email", e);
+            }
+
             return "your appoinment has been booked.";
         } catch (AppoinmentNotBookedException e) {
             throw new AppoinmentNotBookedException("appoinment not booked please try again.");
@@ -85,7 +108,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         int currentMonth = currentDate.getMonthValue();
 
         List<Appointment> appointments = appointmentRepository.findByYearAndMonth(currentYear, currentMonth, userId);
-        
+
         for (Appointment appointment : appointments) {
             AppointmentModel appointmentModel = new AppointmentModel();
             appointmentModel.setAppointmentId(appointment.getAppointmentId());
@@ -94,16 +117,16 @@ public class AppointmentServiceImpl implements AppointmentService {
             appointmentModel.setReason(appointment.getReason());
 
             List<Profile> profiles = profileRepository.findByType(appointment.getReason());
-            
-            if(!profiles.isEmpty()){
+
+            if (!profiles.isEmpty()) {
                 Profile profile = profiles.get(0);
-                appointmentModel.setDoctor(profile.getUser().getFirstName()+" "+profile.getUser().getLastName());
+                appointmentModel.setDoctor(profile.getUser().getFirstName() + " " + profile.getUser().getLastName());
                 appointmentModel.setDoctorId(profile.getUser().getUserId());
-            }else{
+            } else {
                 appointmentModel.setDoctor("N/A");
                 appointmentModel.setDoctorId("N/A");
             }
-            
+
             int age = AgeCalculator.calculateAge(appointment.getDateOfBirth());
             appointmentModel.setAge(age);
             appointmentModel.setAppointmentDate(appointment.getAppointmentDate());
@@ -123,9 +146,23 @@ public class AppointmentServiceImpl implements AppointmentService {
         Optional<Appointment> optional = appointmentRepository.findByAppointmentId(appointmentId);
         if (optional.isPresent()) {
             Appointment appointment = optional.get();
-
             appointment.setStatus(AppointmentStatus.CANCEL);
             appointmentRepository.save(appointment);
+
+            // sending email to the user for the cancelation
+            // Prepare email content
+            String patientName = appointment.getPatient().getFirstName() + " " + appointment.getPatient().getLastName();
+            String reason = appointment.getReason();
+            String dateAndTime = appointment.getAppointmentDate() + " " + appointment.getAppointmentTime();
+            String email = appointment.getPatient().getEmail();
+            String subject = "Appointment Cancellation";
+            String text = emailService.appointmentCancellationEmail(patientName, reason, dateAndTime);
+
+            try {
+                emailService.sendEmail(email, subject, text);
+            } catch (MessagingException e) {
+                throw new RuntimeException("Email not send");
+            }
             return "Your appointment has been canceled.";
         }
         throw new AppoinmentNotFoundException("Appointment not found by this Id: " + appointmentId);
