@@ -16,6 +16,9 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     @Query(value="SELECT * FROM Appointment WHERE appointment_id=:id", nativeQuery = true)
     public Optional<Appointment> findByAppointmentId(@Param("id") String id);
 
+    @Query(value = "SELECT * FROM appointement WHERE appointment_id = :appointmentId", nativeQuery = true)
+    public Optional<Appointment> findAppointmentByUserId(@Param("appointmentId") String appointmentId);
+
     @Query(value = "SELECT * FROM Appointment WHERE YEAR(appointment_date)= :year AND MONTH(appointment_date)= :month AND (patient_id = :userId OR doctor_id = :userId )", nativeQuery = true)
     public List<Appointment> findByYearAndMonth(@Param("year") int year, @Param("month") int month, @Param("userId") String userId);
 

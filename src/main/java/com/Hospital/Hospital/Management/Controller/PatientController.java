@@ -70,7 +70,7 @@ public class PatientController {
     }
 
     @GetMapping("reason/types")
-    public ResponseEntity<List<String>> getReasonTypes(){
+    public ResponseEntity<List<String>> getReasonTypes(){   
         List<String> types = appointmentServiceImpl.getReasonTypes();
         return new ResponseEntity<>(types, HttpStatus.OK);
     }
